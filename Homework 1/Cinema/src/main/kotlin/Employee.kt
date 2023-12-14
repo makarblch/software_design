@@ -3,36 +3,28 @@
  * @param name name of employee
  * @param lastName last name of employee
  */
-class Employee(login : String, password : String) {
-    private var login: String
-    private var password : String
-
-    var Login : String
-        get() = login
-        set(value) {
-            login = value
-        }
-    init{
-        this.login = login
-        this.password = password
-    }
-
-    private var _isLogged : Boolean = false
-    val IsLogged : Boolean
-        get() = _isLogged
+class Employee(var login : String, private var password : String) {
+    var isLogged : Boolean = false
 
     /**
      * changes user's status isLogged to true
      */
     fun logIn() {
-        _isLogged = true
+        print("Write down your password: ")
+        var attempt = readln()
+        while (password != attempt) {
+            println("Incorrect password! Try again! ")
+            print("Write down your password: ")
+            attempt = readln()
+        }
+        isLogged = true
     }
 
     /**
      * changes user's status isLogged to true
      */
     fun logOut() {
-        _isLogged = false
+        isLogged = false
     }
 
     override fun toString(): String {

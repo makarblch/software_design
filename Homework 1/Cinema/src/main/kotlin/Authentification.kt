@@ -1,28 +1,33 @@
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 /**
  * A class for signing up a new employee and creating a password
  */
 class Authentification {
-    fun authentification() : Boolean {
+    fun authentication() : Employee {
         println("Hello! Welcome to our cinema managing system!\n" +
                 "To continue using it you will need to log in. Do you have an account?")
         val reply = readln().lowercase()
         if (reply == "yes" || reply == "да" || reply == "si") {
             print("Input your login: ")
             val login = readln()
-            val employee = employees.find { it.Login == login }
+            val employee = employees.find { it.login == login }
             if (employee == null) {
                 println("No such user found! Try to sign up")
-                return false
+                return signUp()
             }
             employee.logIn()
-            return true
+            return employee
         }
-        return false
+        return signUp()
     }
     /**
      * Function for signing up new employee
      */
-    fun signUp() {
+    fun signUp() : Employee {
         print("Input your login: ")
         val login = readln()
         print("Input your password: ")
@@ -43,8 +48,9 @@ class Authentification {
         // Adding new employee to the common list. Add encrypting!
         val employee = Employee(login, encryptPassword(password))
         // Signed up person is straight away logged in
-        employee.logIn()
+        employee.isLogged = true
         employees.add(employee)
+        return employee
     }
 
     /**

@@ -3,16 +3,32 @@ var employees: MutableList<Employee> = mutableListOf()
 
 
 fun main(args: Array<String>) {
-    // Creating an object of our management system
-    var system: System
-    // Creating an object of authentification
+    // Creating an object of authentication system
     val auth = Authentification()
+    // Creating an object of our management system
+    val system = System()
+    // Creating .json files
+    system.createFiles()
+    // Starting using a program.
     while (true) {
-        if (!auth.authentification()) {
-            auth.signUp()
+        // Authentication
+        val employee = auth.authentication()
+        system.employee = employee
+        // Starting a user session for a current employee
+        var userSession = true
+        while (userSession) {
+            system.deserialize()
+            // Show employee a command menu
+            system.menu()
+            println("Do you want to exit?")
+            val reply = readln().lowercase()
+            if (reply == "yes" || reply == "да" || reply == "si") {
+                userSession = false
+                employee.logOut()
+            }
+            system.serialize()
         }
-        // Some actions
-        println("Do you want to exit?")
+        println("Do you want to finish the program?")
         val reply = readln().lowercase()
         if (reply == "yes" || reply == "да" || reply == "si") {
             break
