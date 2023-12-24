@@ -12,11 +12,15 @@ class Employee(var login : String, private var password : String) {
     fun logIn() {
         print("Write down your password: ")
         var attempt = readln()
-        while (password != attempt) {
+        var encrypt = Authentification.encryptPassword(attempt)
+        println("password : $password , encrypt: $encrypt")
+        while (password != encrypt) {
             println("Incorrect password! Try again! ")
             print("Write down your password: ")
             attempt = readln()
+            encrypt = Authentification.encryptPassword(attempt)
         }
+        println("Successfully logged in!")
         isLogged = true
     }
 

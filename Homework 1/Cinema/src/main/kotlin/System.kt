@@ -1,29 +1,37 @@
 import kotlin.random.Random
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 
-interface IChangeSession {
+/**
+ * Interface for methods of changing sessions
+ */
+interface ChangeSession {
     fun changeSessionMovie(id: Int)
     fun changeSessionTime(id: Int)
 }
 
-interface IChangeMovie {
+/**
+ * Interface for methods of changing movies
+ */
+interface ChangeMovie {
     fun changeMovieName(movie: String)
     fun changeMovieDirector(movie: String)
     fun changeMovieDuration(movie: String)
 }
 
-class System : IChangeMovie, IChangeSession {
-    private var movies: MutableList<Movie> = mutableListOf()
-    private var sessions: MutableList<Session> = mutableListOf()
-    private var tickets: MutableList<Ticket> = mutableListOf()
-    private var index: Int = 0
+/**
+ * A managing system class. All methods are implemented here.
+ */
+class System : ChangeMovie, ChangeSession {
+    var movies: MutableList<Movie> = mutableListOf()
+    var sessions: MutableList<Session> = mutableListOf()
+    var tickets: MutableList<Ticket> = mutableListOf()
+    var index: Int = 0
     lateinit var employee: Employee
 
 
+    /**
+     * Checking whether the employee is logged in or not
+     */
     private fun check() {
         if (!employee.isLogged) {
             println("You are not logged in!")
@@ -31,65 +39,97 @@ class System : IChangeMovie, IChangeSession {
         }
     }
 
+    /**
+     * Shows main commands
+     */
     fun menu() {
         check()
         println(
             "Choose a command (write a number): \n1. Add new movie\n2. Change existing movie name\n" +
                     "3. Change existing movie director\n4. Change existing movie duration\n" +
-                    "5. Add new session\n6. Change existing session movie" +
-                    "7. Change existing session time\n8.Show cinema hall for a specific session\n" +
-                    "9. Sell a ticket\n10. Return a ticket"
+                    "5. Add new session\n6. Change existing session movie\n" +
+                    "7. Change existing session time\n8. Show cinema hall for a specific session\n" +
+                    "9. Sell a ticket\n10. Return a ticket\n11. Mark a visitor\n" +
+                    "12. Show all movies\n13. Show all sessions"
         )
-        val option = readln().toInt()
+        val option = readln().toIntOrNull() ?: 14
         activity(option)
     }
 
+    /**
+     * Matches the command id with the command implementation
+     */
     private fun activity(command: Int) {
         // Add movie
-        if (command == 1) {
-            addMovie()
-        } else if (command in 2..4) {
-            print("Input a current movie name: ")
-            val movie = readln()
-            when (command) {
-                2 -> changeMovieName(movie)
-                3 -> changeMovieDirector(movie)
-                4 -> changeMovieDuration(movie)
+        when (command) {
+            1 -> {
+                addMovie()
             }
-            // Add session
-        } else if (command == 5) {
-            addSession()
-        } else if (command in 6..9) {
-            print("Input a current session Id: ")
-            val id = readln().toInt()
-            when (command) {
-                6 -> changeSessionMovie(id)
-                7 -> changeSessionTime(id)
-                8 -> show(id)
-                9 -> sellTicket(id)
+            in 2..4 -> {
+                print("Input a current movie name: ")
+                val movie = readln()
+                when (command) {
+                    2 -> changeMovieName(movie)
+                    3 -> changeMovieDirector(movie)
+                    4 -> changeMovieDuration(movie)
+                }
+                // Add session
             }
-        } else if (command == 10) {
-            print("Input the ticketId: ")
-            val tickedId = readln().toInt()
-            returnTicket(tickedId)
-        } else {
-            println("No such command :(")
+            5 -> {
+                addSession()
+            }
+            in 6..9 -> {
+                print("Input a current session Id: ")
+                val id = readln().toIntOrNull() ?: -1
+                when (command) {
+                    6 -> changeSessionMovie(id)
+                    7 -> changeSessionTime(id)
+                    8 -> show(id)
+                    9 -> sellTicket(id)
+                }
+            }
+            10 -> {
+                print("Input the ticketId: ")
+                val tickedId = readln().toIntOrNull() ?: -1
+                returnTicket(tickedId)
+            }
+            11 -> {
+                print("Input the ticketId: ")
+                val tickedId = readln().toIntOrNull() ?: -1
+                markVisitor(tickedId)
+            }
+            12 -> {
+                showMovies()
+            }
+            13 -> {
+                showSessions()
+            }
+            else -> {
+                println("No such command :(")
+            }
         }
     }
 
-    fun addMovie() {
+    /**
+     * Adding movie to the movie list
+     */
+    private fun addMovie() {
         check()
         print("Input name of a new movie: ")
         val name = readln()
         print("Input name of director's last name: ")
         val director = readln()
         print("Input a duration of the movie (in minutes): ")
-        val duration = readln().toInt()
+        val duration = readln().toIntOrNull() ?: 0
         val movie = Movie(name, director, duration)
         movies.add(movie)
+        println("Successfully added!")
     }
 
-    fun addSession() {
+    /**
+     * Adding session to the session list
+     */
+    private fun addSession() {
         check()
         print("Input name of the movie: ")
         val name = readln()
@@ -97,16 +137,21 @@ class System : IChangeMovie, IChangeSession {
         if (movie == null) {
             println("No such movie :( Try to add new movie before creating a session")
         } else {
-            print("Input date and time of the session: ")
+            print("Input date and time of the session (dd/MM/yyyy HH:mm) : ")
             var date = readln()
             while (!dateValidation(date)) {
                date = readln()
             }
             sessions.add(Session(index, movie, date))
+            println("Successfully added! Session id: $index")
             ++index
         }
     }
 
+    /**
+     * Changing movie name
+     * @param movie name of movie
+     */
     override fun changeMovieName(movie: String) {
         check()
         val current = movies.find { it.name == movie }
@@ -116,9 +161,14 @@ class System : IChangeMovie, IChangeSession {
             print("Input a new movie name: ")
             val name = readln()
             current.name = name
+            println("Successfully changed!")
         }
     }
 
+    /**
+     * Changing movie director
+     * @param movie name of movie
+     */
     override fun changeMovieDirector(movie: String) {
         check()
         val current = movies.find { it.name == movie }
@@ -128,9 +178,14 @@ class System : IChangeMovie, IChangeSession {
             print("Input a new movie director: ")
             val director = readln()
             current.director = director
+            println("Successfully changed!")
         }
     }
 
+    /**
+     * Changing movie duration
+     * @param movie name of movie
+     */
     override fun changeMovieDuration(movie: String) {
         check()
         val current = movies.find { it.name == movie }
@@ -138,11 +193,20 @@ class System : IChangeMovie, IChangeSession {
             println("No such movie :(")
         } else {
             print("Input a new movie duration: ")
-            val duration = readln().toInt()
+            val duration = readln().toIntOrNull() ?: 0
+            if (duration == 0) {
+                println("Due to some problems, duration is currently 0")
+            } else {
+                println("Successfully changed!")
+            }
             current.duration = duration
         }
     }
 
+    /**
+     * Changing movie of the session
+     * @param id session id
+     */
     override fun changeSessionMovie(id: Int) {
         check()
         val session = sessions.find { it.id == id }
@@ -156,10 +220,15 @@ class System : IChangeMovie, IChangeSession {
                 println("No such movie found :( Try to add a new movie before changing a session")
             } else {
                 session.movie = movie
+                println("Successfully changed!")
             }
         }
     }
 
+    /**
+     * Changing time of the session
+     * @param id session id
+     */
     override fun changeSessionTime(id: Int) {
         check()
         val session = sessions.find { it.id == id }
@@ -172,10 +241,15 @@ class System : IChangeMovie, IChangeSession {
                 date = readln()
             }
             session.time = date
+            println("Successfully changed!")
         }
     }
 
-    fun show(sessionId: Int) {
+    /**
+     * Shows all cinema hall places of the session
+     * @param sessionId session id
+     */
+    private fun show(sessionId: Int) {
         check()
         val session = sessions.find { it.id == sessionId }
         if (session == null) {
@@ -186,30 +260,58 @@ class System : IChangeMovie, IChangeSession {
     }
 
     /**
+     * Shows all available movies
+     */
+    private fun showMovies() {
+        for (element in movies) {
+            println(element)
+        }
+    }
+
+    /**
+     * Shows all available sessions
+     */
+    private fun showSessions() {
+        for (element in sessions) {
+            println(element)
+        }
+    }
+
+    /**
      * Functions that sells tickets
      * @param name name of movie
      */
-    fun sellTicket(sessionId: Int) {
+    private fun sellTicket(sessionId: Int) {
         check()
         val session = sessions.find { it.id == sessionId }
         if (session == null) {
             println("No such session :(")
         } else {
-            // variables for row and column number
+            // Show the cinema hall scheme
+            println("Выберите место : ")
+            show(session.id)
+            // Variables for row and column number
             var row: Int
             var column: Int
             // Generate random ticket number
             val generator = Random.nextInt(1000000)
             // While place is not available, repeat
             while (true) {
-                print("Input a row number")
-                row = readln().toInt()
-                print("Input a column number")
-                column = readln().toInt()
+                print("Input a row number: ")
+                row = readln().toIntOrNull() ?: -1
+                print("Input a column number: ")
+                column = readln().toIntOrNull() ?: -1
+                if (row == -1 || column == -1 || row >= 10 || column >= 10) {
+                    println("Incorrect row/column number! Try again!")
+                    continue
+                }
                 if (session.cinemaHall[row][column] == 0) {
                     println("Successfully ordered!")
                     val ticket = Ticket(generator, session, row, column)
                     tickets.add(ticket)
+                    println("Your ticket number: ${ticket.ticketNr}")
+                    // Change place status since it has been ordered
+                    session.cinemaHall[row][column] = 1
                     break
                 }
                 println("Ooops! This place is already booked :( Try again!")
@@ -217,7 +319,32 @@ class System : IChangeMovie, IChangeSession {
         }
     }
 
-    fun returnTicket(ticketId: Int): Boolean {
+    /**
+     * Returns a ticket
+     * @param ticketId ticket id
+     */
+    private fun returnTicket(ticketId: Int): Boolean {
+        check()
+        val ticket = tickets.find { it.ticketNr == ticketId }
+        // checking if there is no such ticket
+        if (ticket == null) {
+            println("No such ticket :(")
+            return false
+        }
+        val session = sessions.find { it.id == ticket.session.id} ?: return false
+        // Making a place free
+        session.cinemaHall[ticket.row][ticket.column] = 0
+        // Removing the ticket from list
+        tickets.removeIf { it.ticketNr == ticketId }
+        println("Successfully returned!")
+        return true
+    }
+
+    /**
+     * Markes a visitor of a session
+     * @param ticketId ticket id
+     */
+    private fun markVisitor(ticketId: Int) : Boolean {
         check()
         val ticket = tickets.find { it.ticketNr == ticketId }
         // checking if there is no such ticket
@@ -226,73 +353,24 @@ class System : IChangeMovie, IChangeSession {
             return false
         }
         val session = ticket.session
-        // Making a place free
-        session.cinemaHall[ticket.row][ticket.column] = 0
-        // Removing the ticket from list
-        tickets.removeIf { it.ticketNr == ticketId }
+        // Put a tick on visitor's place (which means that he came)
+        session.sessionVisitors[ticket.row][ticket.column] = 1
+        println("Successfully! Enjoy ${ticket.session.movie}!")
         return true
     }
 
-    fun deserialize() {
-        try {
-            var read = File("movies.json").readText(Charsets.UTF_8)
-            if (read != "") {
-                movies = Json.decodeFromString<MutableList<Movie>>(read)
-            }
-            read = File("sessions.json").readText(Charsets.UTF_8)
-            if (read != "") {
-                sessions = Json.decodeFromString<MutableList<Session>>(read)
-            }
-            read = File("tickets.json").readText(Charsets.UTF_8)
-            if (read != "") {
-                tickets = Json.decodeFromString<MutableList<Ticket>>(read)
-            }
-        } catch (ex : IOException) {
-            println("Unable to read files :(")
-        } catch (_ : Exception) {
-            println("Ooops! Something went wrong!")
-        }
-    }
-
-    fun serialize() {
-        try {
-            if (movies.size != 0) {
-                File("movies.json").writeText(Json.encodeToString<MutableList<Movie>>(movies))
-            }
-            if (sessions.size != 0) {
-                File("sessions.json").writeText(Json.encodeToString<MutableList<Session>>(sessions))
-            }
-            if (tickets.size != 0) {
-                File("tickets.json").writeText(Json.encodeToString<MutableList<Ticket>>(tickets))
-            }
-        } catch (ex : IOException) {
-            println("Unable to write files :(")
-        } catch (_ : Exception) {
-            println("Ooops! Something went wrong!")
-        }
-    }
-    fun createFiles() {
-        try {
-            File("movies.json").createNewFile()
-            File("sessions.json").createNewFile()
-            File("tickets.json").createNewFile()
-        } catch (e: IOException) {
-            println("Unable to create files :(")
-        } catch (_: Exception) {
-            println("Ooops! Something went wrong")
-        }
-    }
-
-    fun dateValidation (date: String?): Boolean {
+    /**
+     * Checkes if given date is correct
+     */
+    private fun dateValidation (date: String?): Boolean {
         val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm")
         formatter.isLenient = false
         return try {
             formatter.parse(date)
             true
         } catch (e: Exception) {
-            println("Incorrect date :(")
+            println("Incorrect date :( Try again! Input date: ")
             false
         }
     }
-
 }

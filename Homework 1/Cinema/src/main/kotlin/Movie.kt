@@ -1,5 +1,4 @@
 import kotlinx.serialization.Serializable
-import java.io.File
 
 /**
  * A class that contains information about current movies

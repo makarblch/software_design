@@ -3,10 +3,12 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.security.MessageDigest
+import java.lang.StringBuilder
 /**
- * A class for signing up a new employee and creating a password
+ * A companion class for signing up a new employee and creating a password
  */
-class Authentification {
+object Authentification {
     fun authentication() : Employee {
         println("Hello! Welcome to our cinema managing system!\n" +
                 "To continue using it you will need to log in. Do you have an account?")
@@ -53,10 +55,17 @@ class Authentification {
         return employee
     }
 
+    private fun getHash(inByte : ByteArray) : String {
+        var bytes = MessageDigest.getInstance("SHA-256").digest(inByte)
+        return with (StringBuilder()) {
+            bytes.forEach { byte -> append(String.format("%02X", byte)) }
+            toString().lowercase()
+        }
+    }
     /**
      * A function to encrypt the password
      */
-    private fun encryptPassword(password : String) : String{
-        return password.lowercase()
+    fun encryptPassword(password : String) : String{
+        return getHash(password.toByteArray())
     }
 }
