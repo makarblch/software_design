@@ -1,0 +1,38 @@
+User makarblch signed up as admin successfully
+User makarblch logged in as Guest
+User makarblch logged in as Guest
+Admin makarblch added new makarblch dish
+User makarblch created an 0 order
+Status of order 0 changed to Preparing
+User makarblch checked the status of their order
+Status of order 0 changed to Ready
+User makarblch checked the status of their order
+User makarblch payed their order
+User makarblch failed to pay their order as they weren't found
+User makarblch logged in as Guest
+User makarblch added review to their order
+User makarblch checked the status of their order
+User makarblch created an 1 order
+Status of order 1 changed to Preparing
+Status of order 1 changed to Ready
+User makarblch added review to their order
+User makarblch created an 2 order
+Status of order 2 changed to Preparing
+Status of order 2 changed to Ready
+User makarblch added review to their order
+User makarblch logged in as Guest
+Admin makarblch got average scores of order reviews
+User makarblch logged in as Guest
+Admin makarblch got statistics of popular dishes
+Admin makarblch got average scores of order reviews
+User makarblch logged in as Guest
+User makarblch created an 3 order
+Status of order 3 changed to Preparing
+Status of order 3 changed to Ready
+User makarblch added review to their order
+Admin makarblch got positive scores of order reviews
+User makarblch logged out
+User makarblch logged in as Guest
+User makarblch created an 4 order
+Status of order 4 changed to Preparing
+User makarblch cancelled their order
